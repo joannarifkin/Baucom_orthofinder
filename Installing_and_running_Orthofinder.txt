@@ -1,0 +1,22 @@
+# Download Orthofinder
+# See https://davidemms.github.io/orthofinder_tutorials/downloading-and-running-orthofinder.html
+
+wget https://github.com/davidemms/OrthoFinder/releases/latest/download/OrthoFinder.tar.gz
+
+# Unpack the tar archive
+
+tar -xzvf OrthoFinder.tar.gz
+
+cd OrthoFinder/
+
+# Add Orthofinder to your path
+pwd
+export PATH=$PATH:/home/jlrifkin/Software/OrthoFinder #Temporary
+PATH=$PATH:/home/jlrifkin/Software/OrthoFinder #permanent - add this line to your .bash_profile
+
+# Run the example analyses in a directory of your choice
+
+orthofinder -f [absolute/path/to]ExampleData/
+orthofinder -f /home/jlrifkin/Software/OrthoFinder/ExampleData
+
+# Make a proteomes folder and stock it with peptide files relevant to your analysis
