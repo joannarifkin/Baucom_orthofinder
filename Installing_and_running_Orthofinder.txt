@@ -1,22 +1,54 @@
-# Download Orthofinder
-# See https://davidemms.github.io/orthofinder_tutorials/downloading-and-running-orthofinder.html
 
-wget https://github.com/davidemms/OrthoFinder/releases/latest/download/OrthoFinder.tar.gz
+#Load the OrthoFinder module
 
-# Unpack the tar archive
+		module use /nfs/turbo/rsbaucom/lab/Lmod
+		module load orthofinder_module
 
-tar -xzvf OrthoFinder.tar.gz
 
-cd OrthoFinder/
+#If the module is no longer operational, download your own copy:
 
-# Add Orthofinder to your path
-pwd
-export PATH=$PATH:/home/jlrifkin/Software/OrthoFinder #Temporary
-PATH=$PATH:/home/jlrifkin/Software/OrthoFinder #permanent - add this line to your .bash_profile
+		# Download Orthofinder
+		# See https://davidemms.github.io/orthofinder_tutorials/downloading-and-running-orthofinder.html
+
+		wget https://github.com/davidemms/OrthoFinder/releases/latest/download/OrthoFinder.tar.gz
+
+		# Unpack the tar archive
+
+		tar -xzvf OrthoFinder.tar.gz
+
+		cd OrthoFinder/
+
+		#Add the location to the lmod module or add orthofinder to your path
+		
+		# Add Orthofinder to your path
+		pwd
+		export PATH=$PATH:/home/jlrifkin/Software/OrthoFinder #Temporary
+		PATH=$PATH:/home/jlrifkin/Software/OrthoFinder #permanent - add this line to your .bash_profile
 
 # Run the example analyses in a directory of your choice
 
 orthofinder -f [absolute/path/to]ExampleData/
-orthofinder -f /home/jlrifkin/Software/OrthoFinder/ExampleData
+orthofinder -f /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData
+-> /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData/OrthoFinder/Results_Sep08/
+
 
 # Make a proteomes folder and stock it with peptide files relevant to your analysis
+
+
+# Make symbolic local links to the peptides files in your proteomes folder - either all of them, or a relevant selection
+
+ln -s /home/jlrifkin/Analyses/Orthofinder_analyses/proteomes/*.fa ./
+
+
+
+
+# Downsample the proteomes to only use the longest transcript 
+
+ /home/jlrifkin/Software/OrthoFinder/tools
+
+for f in *fa ; do python ~/orthofinder_tutorial/OrthoFinder/tools/primary_transcript.py $f ; done
+
+for f in *fa ; do python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py $f ; done &
+
+
+
