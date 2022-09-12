@@ -38,17 +38,56 @@ orthofinder -f /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData
 # Make symbolic local links to the peptides files in your proteomes folder - either all of them, or a relevant selection
 
 ln -s /home/jlrifkin/Analyses/Orthofinder_analyses/proteomes/*.fa ./
+ln -s 
 
+#If you have an annotation that is in a gtf or gff but needs to be converted into a fasta:
 
+		module use /nfs/turbo/rsbaucom/lab/Lmod
+		module load gffread_module
+
+	   gffread  /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.gff  -g /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_headings_fixed.faa -Sy  /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.pep.fa & 
+
+		#This extracts and translates transcripts and ignores other features (e.g. exons, mRNA)
 
 
 # Downsample the proteomes to only use the longest transcript 
 
  /home/jlrifkin/Software/OrthoFinder/tools
 
-for f in *fa ; do python ~/orthofinder_tutorial/OrthoFinder/tools/primary_transcript.py $f ; done
-
 for f in *fa ; do python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py $f ; done &
 
 
+# Run the analysis in the directory of your choice, containing the proteomes
 
+# Guidelines for memory, here with a SLURM script https://meschedl.github.io/MESPutnam_Open_Lab_Notebook/M_P_Orthofinder/
+ From the Orthofinder manual: "0.2 GB per species for even larger genomes (e.g. plants) I.e. running an analysis on 10 vertebrate species with 5 threads for the OrthoFinder algorithm (-a 5) might require 10 x 0.04 = 0.4 GB per thread and so 5 x 0.4 = 2 GB of RAM in total." (Very very rough!) A job with 6 CPUs, 2 nodes, and 4 GB memory per node was overkill for 14 spp (~32% efficient use of 48GB - so, a 2/3 cut to 16GB total would do it)
+
+sbatch orthofinder.sh 
+
+orthofinder -f /home/jlrifkin/Analyses/Orthofinder_analyses/Ipomoea_9-9-2022/primary_transcripts
+
+#To add another species to an existing analysis, simply copy the new sequence to a directory and run the following:
+
+#Downsample the new transcript (this will create a "primary_transcript" directory in whichever directory the target sequence is in)
+
+python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.pep.fa &
+
+#If the sequence is in nucleotides, run these commands:
+	module load Bioinformatics
+	module load Bioinformatics  gcc/10.3.0-k2osx5y
+	module load blast-plus/2.12.0-fuhtx75
+	
+	#Nucleotide mode requires access to BLAST
+
+#Then, run the script to add the new sequence to the analysis 
+
+	#Basic format:
+	orthofinder -d -b previous orthofinder directory -f new fasta directory #"The previous orthofinder directory is the OrthoFinder `WorkingDirectory/'
+containing the file `SpeciesIDs.txt'." NB that the -d option indicates that we are adding a nucleotide file. 
+	#Demo file: 
+	sbatch orthofinder_script_add_species.sh
+
+	#Output: /home/jlrifkin/Analyses/Orthofinder_analyses/Ipomoea_9-9-2022/primary_transcripts/OrthoFinder/Results_Sep09_2/WorkingDirectory/OrthoFinder/Results_Sep12_3
+
+#Copied to /nfs/turbo/rsbaucom/lab/Orthofinder_analysis/Results_Sep09_2/
+#See https://davidemms.github.io/orthofinder_tutorials/exploring-orthofinders-results.html for a rundown of what the results are
