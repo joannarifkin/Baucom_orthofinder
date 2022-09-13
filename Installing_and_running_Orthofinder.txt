@@ -27,34 +27,35 @@
 
 # Run the example analyses in a directory of your choice
 
-orthofinder -f [absolute/path/to]ExampleData/
-orthofinder -f /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData
--> /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData/OrthoFinder/Results_Sep08/
+	orthofinder -f [absolute/path/to]ExampleData/
+	orthofinder -f /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData
+	-> /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/ExampleData/OrthoFinder/Results_Sep08/
 
 
 # Make a proteomes folder and stock it with peptide files relevant to your analysis
+	
+	For an example, see /home/jlrifkin/Analyses/Orthofinder_analyses/proteomes and /nfs/turbo/rsbaucom/lab/Orthofinder_analysis/Peptide_references.csv
 
+# Make symbolic local links to the peptides files in your analysis folder - either all of them, or a relevant selection
 
-# Make symbolic local links to the peptides files in your proteomes folder - either all of them, or a relevant selection
+	ln -s /home/jlrifkin/Analyses/Orthofinder_analyses/proteomes/*.fa ./
+	ln -s 
 
-ln -s /home/jlrifkin/Analyses/Orthofinder_analyses/proteomes/*.fa ./
-ln -s 
-
-#If you have an annotation that is in a gtf or gff but needs to be converted into a fasta:
+#If you have an annotation that is in a gtf or gff but needs to be converted into a peptide fasta:
 
 		module use /nfs/turbo/rsbaucom/lab/Lmod
 		module load gffread_module
 
 	   gffread  /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.gff  -g /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_headings_fixed.faa -Sy  /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.pep.fa & 
 
-		#This extracts and translates transcripts and ignores other features (e.g. exons, mRNA)
+		#This uses the annotation and the genome to extract and translate transcripts. It ignores other features (e.g. exons, mRNA)
 
 
 # Downsample the proteomes to only use the longest transcript 
 
- /home/jlrifkin/Software/OrthoFinder/tools
+	 /home/jlrifkin/Software/OrthoFinder/tools
 
-for f in *fa ; do python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py $f ; done &
+	for f in *fa ; do python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py $f ; done &
 
 
 # Run the analysis in the directory of your choice, containing the proteomes
@@ -62,15 +63,19 @@ for f in *fa ; do python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/pri
 # Guidelines for memory, here with a SLURM script https://meschedl.github.io/MESPutnam_Open_Lab_Notebook/M_P_Orthofinder/
  From the Orthofinder manual: "0.2 GB per species for even larger genomes (e.g. plants) I.e. running an analysis on 10 vertebrate species with 5 threads for the OrthoFinder algorithm (-a 5) might require 10 x 0.04 = 0.4 GB per thread and so 5 x 0.4 = 2 GB of RAM in total." (Very very rough!) A job with 6 CPUs, 2 nodes, and 4 GB memory per node was overkill for 14 spp (~32% efficient use of 48GB - so, a 2/3 cut to 16GB total would do it)
 
-sbatch orthofinder.sh 
+	sbatch orthofinder.sh 
 
-orthofinder -f /home/jlrifkin/Analyses/Orthofinder_analyses/Ipomoea_9-9-2022/primary_transcripts
+	orthofinder -f /home/jlrifkin/Analyses/Orthofinder_analyses/Ipomoea_9-9-2022/primary_transcripts
+
+
+
+
 
 #To add another species to an existing analysis, simply copy the new sequence to a directory and run the following:
 
 #Downsample the new transcript (this will create a "primary_transcript" directory in whichever directory the target sequence is in)
 
-python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.pep.fa &
+	python3 /nfs/turbo/rsbaucom/lab/SOFTWARE/OrthoFinder/tools/primary_transcript.py /nfs/turbo/rsbaucom/lab/IP_genome_COGE/Ipomoea_purpurea_annos1-cds0-id_typename-nu1-upa1-add_chr0.gid58735.pep.fa &
 
 #If the sequence is in nucleotides, run these commands:
 	module load Bioinformatics
